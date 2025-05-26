@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nikotin‑konverterer</title>
+  <style>
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      background: #f4f4f4;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem;
+    }
+    .pack {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      width: 320px;
+      margin: 1rem;
+    }
+    .pack h2 {
+      font-size: 14pt;
+      color: #A7A9AC; /* Pantone Cool Gray 2 C approximation */
+      font-weight: normal;
+      text-transform: capitalize;
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    input {
+      width: 100%;
+      max-width: 80%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #333;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    .result {
+      margin-top: 1rem;
+      line-height: 1.5;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+    }
+    .result strong {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="pack" id="vape-section">
+    <h2>E-sigarett</h2>
+    <label for="vapeVolume">Volum (mL)</label>
+    <input type="number" id="vapeVolume" placeholder="Eks: 2" min="0" step="0.1">
+    <label for="vapeStrength">Styrke (mg/mL)</label>
+    <input type="number" id="vapeStrength" placeholder="Eks: 20" min="0" step="0.1">
+    <button onclick="calculateVape()">Beregn</button>
+    <div class="result" id="vapeResult"></div>
+  </div>
+
+  <div class="pack" id="snus-section">
+    <h2>Snus</h2>
+    <label for="snusMg">Nikotin per porsjon (mg)</label>
+    <input type="number" id="snusMg" placeholder="Eks: 18" min="0" step="0.1">
+    <button onclick="calculateSnus()">Beregn</button>
+    <div class="result" id="snusResult"></div>
+  </div>
+
+  <script>
+    const mgPerCigarette = 1.1;             // mg systemisk nikotin per sigarett
+    const dryWeightPerCig = 10;            // mg nikotin per sigarett i tørrvekt
+    const eSigAbsFraction = 0.5;           // 50 % opptak e-sig
+    const snusAbsFraction = 3.75 / 18;     // ≈20,8 % opptak snus
+
+    function formatResult(lines) {
+      return lines.join('\n');
+    }
+
+    function calculateVape() {
+      const vol = parseFloat(document.getElementById('vapeVolume').value) || 0;
+      const str = parseFloat(document.getElementById('vapeStrength').value) || 0;
+      const totalNic = vol * str;
+      const dryCigs = (totalNic / dryWeightPerCig).toFixed(1);
+      const absNic = (totalNic * eSigAbsFraction).toFixed(1);
+      const absCigs = (absNic / mgPerCigarette).toFixed(1);
+      const lines = [
+        `1 e-sigarett med ${vol} mL væske med ${str} mg/mL nikotin inneholder **${totalNic.toFixed(1)} mg** nikotin.`,
+        `Dette tilsvarer **${dryCigs}** sigaretter i tørrvekt.`,
+        `Av dette tas ${absNic} mg opp av kroppen, noe som tilsvarer **${absCigs}** sigaretter.`
+      ];
+      document.getElementById('vapeResult').innerHTML = formatResult(lines).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    }
+
+    function calculateSnus() {
+      const mg = parseFloat(document.getElementById('snusMg').value) || 0;
+      const dryCigs = (mg / dryWeightPerCig).toFixed(1);
+      const absNic = (mg * snusAbsFraction).toFixed(1);
+      const absCigs = (absNic / mgPerCigarette).toFixed(1);
+      const lines = [
+        `1 snusporsjon med ${mg} mg nikotin inneholder **${mg.toFixed(1)} mg** nikotin.`,
+        `Dette tilsvarer **${dryCigs}** sigaretter i tørrvekt.`,
+        `Av dette tas ${absNic} mg opp av kroppen, noe som tilsvarer **${absCigs}** sigaretter.`
+      ];
+      document.getElementById('snusResult').innerHTML = formatResult(lines).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    }
+  </script>
+</body>
+</html>
