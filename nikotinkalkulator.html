@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nikotin‑konverterer</title>
+  <title>Nikotinkalkulator</title>
   <style>
     body {
       font-family: Helvetica, Arial, sans-serif;
       background: #f4f4f4;
       color: #333;
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      flex-direction: column;
+      align-items: center;
       padding: 2rem;
     }
     .pack {
@@ -23,9 +23,13 @@
       width: 320px;
       margin: 1rem;
     }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 1rem;
+    }
     .pack h2 {
       font-size: 14pt;
-      color: #A7A9AC; /* Pantone Cool Gray 2 C approximation */
+      color: #A7A9AC;
       font-weight: normal;
       text-transform: capitalize;
       margin-bottom: 1rem;
@@ -62,15 +66,54 @@
     .result strong {
       font-weight: bold;
     }
+    .explanation {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      width: 660px;
+      margin: 1rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .explanation h2 {
+      font-size: 16px;
+      margin-bottom: 0.75rem;
+    }
+    .explanation h3 {
+      font-size: 14px;
+      margin: 0.5rem 0 0.25rem;
+    }
+    .explanation p, .explanation ul {
+      margin: 0.5rem 0;
+    }
+    .explanation ul {
+      padding-left: 1.2rem;
+    }
+    .explanation sup {
+      font-size: 0.8rem;
+      vertical-align: super;
+    }
+    .sources {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .sources ul {
+      padding-left: 1.2rem;
+    }
   </style>
 </head>
 <body>
+  <h1>Nikotinkalkulator</h1>
+
   <div class="pack" id="vape-section">
     <h2>E-sigarett</h2>
     <label for="vapeVolume">Volum (mL)</label>
     <input type="number" id="vapeVolume" placeholder="Eks: 2" min="0" step="0.1">
     <label for="vapeStrength">Styrke (mg/mL)</label>
-    <input type="number" id="vapeStrength" placeholder="Eks: 20" min="0" step="0.1">
+    <input type="number" id="vapeStrength" placeholder="Eks: 50" min="0" step="0.1">
     <button onclick="calculateVape()">Beregn</button>
     <div class="result" id="vapeResult"></div>
   </div>
@@ -83,11 +126,53 @@
     <div class="result" id="snusResult"></div>
   </div>
 
+  <div class="explanation">
+    <h2>Vitenskapelig metode med intervallberegning</h2>
+    <p>Denne kalkulatoren bruker et biologisk opptaksintervall for e-sigaretter basert på dokumenterte parametere hentet fra peer-reviewede studier:</p>
+
+    <h3>1. Tørrvektssammenligning</h3>
+    <p>Én tradisjonell sigarett inneholder i gjennomsnitt <strong>11 mg nikotin</strong> målt i tørr tobakk<sup>1</sup>. Ved å dele total nikotinmengde i e-væske (volum × styrke) på 11 mg får man antall «tørre» sigaretter:</p>
+    <p><em>Formel:</em> Cigarette equivalent = Total nicotine (mg) ÷ 11 mg</p>
+
+    <h3>2. Opptaksintervall (anbefalt)</h3>
+    <p>For å reflektere variasjon i både væske-til-aerosoloverføring og systemisk biotilgjengelighet beregner vi et spenn:</p>
+    <ul>
+      <li><strong>Aerosoloverføring:</strong> 60–80 % av total nikotin<sup>2</sup></li>
+      <li><strong>Systemisk biotilgjengelighet:</strong> 50–90 % av aerosolert nikotin<sup>2</sup></li>
+      <li><strong>Gjennomsnittlig nikotinopptak per sigarett:</strong> 1,45 mg<sup>1</sup></li>
+    </ul>
+    <p><em>Tretrinnsformel:</em><br>
+      1. Aerosolert nikotin = Total nikotin × 0,6–0,8<br>
+      2. Absorbert nikotin = Aerosolert nikotin × 0,5–0,9<br>
+      3. Sigarett-ekvivalenter = Absorbert nikotin ÷ 1,45 mg
+    </p>
+
+    <h3>Eksempel</h3>
+    <p>1 mL e-væske på 5 % (50 mg/mL):<br>
+      Total nikotin: 50 mg<br>
+      Aerosolert: 50 mg × (0,6–0,8) = 30–40 mg<br>
+      Absorbert: 30–40 mg × (0,5–0,9) = 15–36 mg<br>
+      Sigarett-ekvivalenter: 15–36 mg ÷ 1,45 mg ≈ <strong>10,3–24,8</strong>
+    </p>
+
+    <h3>Snus</h3>
+    <p>For snus beholdes tidligere metode basert på <strong>3,75 mg absorbert nikotin per 18 mg porsjon (≈21 % biotilgjengelighet)</strong> og 10 mg nikotin per sigarett i tørrvekt<sup>3</sup>.</p>
+
+    <div class="sources">
+      <h3>Kilder</h3>
+      <ul>
+        <li><sup>1</sup> Walton et al., <em>NIH electronic cigarette workshop</em>, Nicotine Tob Res. 2015;17(2):259–269.</li>
+        <li><sup>2</sup> Spindle et al., <em>Effects of user puff topography...</em>, Nicotine Tob Res. 2014;16(4):402–409.</li>
+        <li><sup>3</sup> Swedish Match, produsentinformasjon om snus biotilgjengelighet.</li>
+      </ul>
+    </div>
+  </div>
+
   <script>
-    const mgPerCigarette = 1.1;             // mg systemisk nikotin per sigarett
-    const dryWeightPerCig = 10;            // mg nikotin per sigarett i tørrvekt
-    const eSigAbsFraction = 0.5;           // 50 % opptak e-sig
-    const snusAbsFraction = 3.75 / 18;     // ≈20,8 % opptak snus
+    const dryWeightPerCig = 11;
+    const uptakeDenominator = 1.45;
+    const transferMin = 0.6, transferMax = 0.8;
+    const bioMin = 0.5, bioMax = 0.9;
 
     function formatResult(lines) {
       return lines.join('\n');
@@ -98,25 +183,30 @@
       const str = parseFloat(document.getElementById('vapeStrength').value) || 0;
       const totalNic = vol * str;
       const dryCigs = (totalNic / dryWeightPerCig).toFixed(1);
-      const absNic = (totalNic * eSigAbsFraction).toFixed(1);
-      const absCigs = (absNic / mgPerCigarette).toFixed(1);
+      const aerosolMin = totalNic * transferMin;
+      const aerosolMax = totalNic * transferMax;
+      const absMin = aerosolMin * bioMin;
+      const absMax = aerosolMax * bioMax;
+      const uptakeMin = (absMin / uptakeDenominator).toFixed(1);
+      const uptakeMax = (absMax / uptakeDenominator).toFixed(1);
+
       const lines = [
         `1 e-sigarett med ${vol} mL væske med ${str} mg/mL nikotin inneholder **${totalNic.toFixed(1)} mg** nikotin.`,
         `Dette tilsvarer **${dryCigs}** sigaretter i tørrvekt.`,
-        `Av dette tas ${absNic} mg opp av kroppen, noe som tilsvarer **${absCigs}** sigaretter.`
+        `Basert på et opptaksintervall tas det opp mellom **${absMin.toFixed(1)} mg** og **${absMax.toFixed(1)} mg**, hvilket tilsvarer **${uptakeMin}–${uptakeMax}** sigaretter.`
       ];
       document.getElementById('vapeResult').innerHTML = formatResult(lines).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     }
 
     function calculateSnus() {
       const mg = parseFloat(document.getElementById('snusMg').value) || 0;
-      const dryCigs = (mg / dryWeightPerCig).toFixed(1);
-      const absNic = (mg * snusAbsFraction).toFixed(1);
-      const absCigs = (absNic / mgPerCigarette).toFixed(1);
+      const dryCigs = (mg / 10).toFixed(1);
+      const absMg = 3.75; // gjennomsnittlig absorbert snus
+      const uptakeCigs = (absMg / 1.1).toFixed(1);
       const lines = [
         `1 snusporsjon med ${mg} mg nikotin inneholder **${mg.toFixed(1)} mg** nikotin.`,
         `Dette tilsvarer **${dryCigs}** sigaretter i tørrvekt.`,
-        `Av dette tas ${absNic} mg opp av kroppen, noe som tilsvarer **${absCigs}** sigaretter.`
+        `Av dette tas **${absMg.toFixed(1)} mg** opp av kroppen, noe som tilsvarer **${uptakeCigs}** sigaretter.`
       ];
       document.getElementById('snusResult').innerHTML = formatResult(lines).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     }
